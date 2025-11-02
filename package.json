@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"build:dev": "rimraf dist && rollup --config scripts/rollup/react.config.js",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint --ext .ts,.jsx,.tsx --fix --quiet ./packages"
 	},
@@ -11,10 +12,14 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@rollup/plugin-commonjs": "^29.0.0",
 		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.4",
 		"husky": "^9.1.7",
-		"prettier": "^3.6.2"
+		"prettier": "^3.6.2",
+		"rimraf": "^6.1.0",
+		"rollup-plugin-generate-package-json": "^3.2.0",
+		"rollup-plugin-typescript2": "^0.36.0"
 	}
 }
