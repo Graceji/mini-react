@@ -1,26 +1,70 @@
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
-import { FiberNode } from './fiber';
+import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
+import { HostRoot } from './workTags';
 
 let workInProgress: FiberNode | null = null;
 
-function prepareFreshStack(fiber: FiberNode) {
+function prepareFreshStack(root: FiberRootNode) {
 	// 将workInProgress指向第一个需要遍历的fiberNode
-	workInProgress = fiber;
+	workInProgress = createWorkInProgress(root.current, {});
 }
 
-function renderRoot(root: FiberNode) {
+/**
+ * 将updateContainer与renderRoot更新流程连接上
+ * 首屏渲染时，传进来的fiber是hostRootFiber
+ * this.setState, 传进来的fiber是class component对应的fiber
+ *
+ * @export
+ * @param {FiberNode} fiber
+ */
+export function scheduleUpdateOnFiber(fiber: FiberNode) {
+	// 调度功能
+	// 从当前触发更新的fiber，一直向上遍历到fiberRootNode
+	const root = markUpdateFromFiberToRoot(fiber);
+	renderRoot(root);
+}
+
+function markUpdateFromFiberToRoot(fiber: FiberNode) {
+	let node = fiber;
+	let parent = node.return;
+
+	while (parent !== null) {
+		node = parent;
+		parent = node.return;
+	}
+
+	if (node.tag === HostRoot) {
+		return node.stateNode;
+	}
+	return null;
+}
+
+/**
+ * 触发更新的api会调用此方法
+ * 常见的触发更新的方式
+ * ReactDom.createRoot().render(或者老版的ReactDom.render)
+ * this.setState
+ * useState的dispatch方法
+ *
+ * @param {FiberNode} root
+ */
+function renderRoot(root: FiberRootNode) {
 	// 初始化
 	prepareFreshStack(root);
 
 	// 执行递归流程
 	do {
 		try {
-			workLoop();
-			break;
+			workLoop(); // 执行 Fiber 单元任务
+			break; // 没出错：停止 do-while
 		} catch (e) {
+			// workLoop 出错
 			console.warn('workLoop发生错误', e);
+
+			// 不 break，继续下一次循环
 			workInProgress = null;
+			// workInProgress 通常会指向一个新的 Fiber 节点（可恢复点）
 		}
 	} while (true);
 }

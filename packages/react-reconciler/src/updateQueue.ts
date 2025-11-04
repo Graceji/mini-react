@@ -21,6 +21,7 @@ export const createUpdate = <State>(action: Action<State>): Update<State> => {
 };
 
 export const createUpdateQueue = <State>() => {
+	// todo: 这种数据结构的设计是为了让workInprogress fiber和current fiber访问同一个updateQueue
 	return {
 		shared: {
 			pending: null
