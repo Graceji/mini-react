@@ -80,6 +80,13 @@ function performUnitOfWork(fiber: FiberNode) {
 	// next可能是fiber节点的子fiber或者null
 	// 如果是子fiber，继续遍历
 	// 如果是null,说明没有子fiber
+
+	// 更新流程的目的：
+	// 1. 生成wip fiberNode树
+	// 2. 标记副作用flags
+	// 更新流程的步骤
+	// 1. 递：beginWork
+	// 2. 归：completeWork
 	const next = beginWork(fiber);
 	fiber.memoizedProps = fiber.pendingProps;
 
