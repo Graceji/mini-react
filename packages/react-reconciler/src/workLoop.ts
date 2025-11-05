@@ -67,6 +67,12 @@ function renderRoot(root: FiberRootNode) {
 			// workInProgress 通常会指向一个新的 Fiber 节点（可恢复点）
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
+	// wip fiberNode树构建完成，准备提交
+	commitRoot(root);
 }
 
 function workLoop() {
