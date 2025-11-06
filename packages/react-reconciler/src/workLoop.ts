@@ -1,4 +1,5 @@
 import { beginWork } from './beginWork';
+import { commitMutationEffects } from './commitWork';
 import { completeWork } from './completeWork';
 import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
 import { MutationMask, NoFlags } from './fiberFlags';
@@ -99,6 +100,7 @@ function commitRoot(root: FiberRootNode) {
 		// 1. beforeMutation
 		// 2. Mutation
 
+		commitMutationEffects(finishedWork);
 		// 树切换，发生在Mutation后，Layout前
 		root.current = finishedWork;
 
